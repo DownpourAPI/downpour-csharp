@@ -1,0 +1,5 @@
+bin/
+obj/
+.idea/
+/packages/
+/Downpour.sln.DotSettings.user
