@@ -15,7 +15,7 @@ namespace Downpour.Implementations.Deluge
             throw new System.NotImplementedException();
         }
 
-        public IList<Torrent> GetAllTorrents()
+        public IEnumerable<Torrent> GetAllTorrents()
         {
             throw new System.NotImplementedException();
         }

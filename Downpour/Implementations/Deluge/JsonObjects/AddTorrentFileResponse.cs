@@ -6,6 +6,8 @@ namespace Downpour.Implementations.Deluge.JsonObjects
 {
     public class AddTorrentFileResponse
     {
-        
+        public int Id { get; set; }
+        public string Result { get; set; }
+        public ResponseError Error { get; set; }
     }
 }

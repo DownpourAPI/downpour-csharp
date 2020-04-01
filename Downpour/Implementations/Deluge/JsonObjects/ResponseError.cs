@@ -6,6 +6,7 @@ namespace Downpour.Implementations.Deluge.JsonObjects
 {
     public class ResponseError
     {
-        
+        public string Message { get; set; }
+        public int Code { get; set; }
     }
 }

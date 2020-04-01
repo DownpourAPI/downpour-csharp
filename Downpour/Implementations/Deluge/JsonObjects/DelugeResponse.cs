@@ -6,6 +6,8 @@ namespace Downpour.Implementations.Deluge.JsonObjects
 {
     public class DelugeResponse
     {
-        
+        public int Id { get; set; }
+        public bool? Result { get; set; }
+        public ResponseError? Error { get; set; }
     }
 }

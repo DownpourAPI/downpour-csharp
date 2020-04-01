@@ -11,7 +11,7 @@ namespace Downpour.Common
     { 
         public Torrent GetTorrentDetails(string torrentHash);
 
-        public IList<Torrent> GetAllTorrents();
+        public IEnumerable<Torrent> GetAllTorrents();
 
         public DownpourResult RemoveTorrent(string torrentHash);
 

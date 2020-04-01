@@ -1,6 +1,6 @@
 ﻿/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https { get; set; } */
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 using System.Collections.Generic;
 
@@ -21,7 +21,7 @@ namespace Downpour.Common
         public double TimeAdded { get; set; }
         public long TotalDownloaded { get; set; }
         public long TotalUploaded { get; set; }
-        public IList<FileDetails> Files { get; set; }
+        public IEnumerable<FileDetails> Files { get; set; }
         public string RemotePath { get; set; }
     }
 }

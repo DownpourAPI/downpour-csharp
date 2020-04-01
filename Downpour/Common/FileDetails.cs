@@ -8,5 +8,11 @@ namespace Downpour.Common
     {
         public string Name { get; set; }
         public long Size { get; set; }
+
+        public FileDetails(string name, long size)
+        {
+            Name = name;
+            Size = size;
+        }
     }
 }

@@ -6,6 +6,8 @@ namespace Downpour.Implementations.Deluge.JsonObjects
 {
     public class GetFreeSpaceResponse
     {
-        
+        public int Id { get; set; }
+        public long? Result { get; set; }
+        public ResponseError? Error { get; set; }
     }
 }
