@@ -10,7 +10,7 @@ namespace Downpour.Implementations.Deluge.JsonObjects
     public class GetAllTorrentsResponse
     {
         public int Id { get; set; }
-        public Dictionary<string, DelugeTorrent>? Result { get; set; }
-        public ResponseError? Error { get; set; }
+        public Dictionary<string, DelugeTorrent> Result { get; set; }
+        public ResponseError Error { get; set; }
     }
 }

@@ -9,22 +9,22 @@ namespace Downpour.Common
 {
     public interface IRemoteTorrentController
     { 
-        public Torrent GetTorrentDetails(string torrentHash);
+        Torrent GetTorrentDetails(string torrentHash);
 
-        public IEnumerable<Torrent> GetAllTorrents();
+        IEnumerable<Torrent> GetAllTorrents();
 
-        public DownpourResult RemoveTorrent(string torrentHash);
+        DownpourResult RemoveTorrent(string torrentHash, bool withData);
 
-        public DownpourResult PauseTorrent(string torrentHash);
+        DownpourResult PauseTorrent(string torrentHash);
 
-        public DownpourResult ResumeTorrent(string torrentHash);
+        DownpourResult ResumeTorrent(string torrentHash);
 
-        public AddTorrentResult AddMagnet(string magnetLink);
+        AddTorrentResult AddMagnet(string magnetLink);
 
-        public AddTorrentResult AddTorrentFile(FileInfo torrentFile);
+        AddTorrentResult AddTorrentFile(Stream torrentFile);
 
-        public DownpourResult ForceRecheck(string torrentHash);
+        DownpourResult ForceRecheck(string torrentHash);
 
-        public long GetFreeSpace();
+        long GetFreeSpace();
     }
 }

@@ -20,7 +20,7 @@ namespace Downpour.Implementations.Rutorrent
             throw new System.NotImplementedException();
         }
 
-        public DownpourResult RemoveTorrent(string torrentHash)
+        public DownpourResult RemoveTorrent(string torrentHash, bool withData)
         {
             throw new System.NotImplementedException();
         }
@@ -40,7 +40,7 @@ namespace Downpour.Implementations.Rutorrent
             throw new System.NotImplementedException();
         }
 
-        public AddTorrentResult AddTorrentFile(FileInfo torrentFile)
+        public AddTorrentResult AddTorrentFile(Stream torrentFile)
         {
             throw new System.NotImplementedException();
         }

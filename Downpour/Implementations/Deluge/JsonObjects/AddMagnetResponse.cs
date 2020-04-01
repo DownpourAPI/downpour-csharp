@@ -8,6 +8,6 @@ namespace Downpour.Implementations.Deluge.JsonObjects
     {
         public int Id { get; set; }
         public string Result { get; set; }
-        public ResponseError? Error { get; set; }
+        public ResponseError Error { get; set; }
     }
 }
