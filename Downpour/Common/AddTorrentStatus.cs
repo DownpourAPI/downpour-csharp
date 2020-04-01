@@ -6,6 +6,8 @@ namespace Downpour.Common
 {
     public enum AddTorrentStatus
     {
-        
+        Success,
+        Failure,
+        AlreadyExists
     }
 }

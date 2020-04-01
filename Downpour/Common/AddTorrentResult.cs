@@ -6,6 +6,29 @@ namespace Downpour.Common
 {
     public class AddTorrentResult
     {
+        public AddTorrentStatus Status { get; }
         
+        public string Hash { get; }
+
+        private AddTorrentResult(AddTorrentStatus status, string hash = null)
+        {
+            Status = status;
+            Hash = hash;
+        }
+
+        public static AddTorrentResult Success(string torrentHash)
+        {
+            return new AddTorrentResult(AddTorrentStatus.Success, torrentHash);
+        }
+        
+        public static AddTorrentResult Failure()
+        {
+            return new AddTorrentResult(AddTorrentStatus.Failure);
+        }
+        
+        public static AddTorrentResult AlreadyExists()
+        {
+            return new AddTorrentResult(AddTorrentStatus.AlreadyExists);
+        }
     }
 }

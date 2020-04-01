@@ -6,6 +6,7 @@ namespace Downpour.Common
 {
     public class FileDetails
     {
-        
+        public string Name { get; set; }
+        public long Size { get; set; }
     }
 }
