@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Downpour.Common;
+using Newtonsoft.Json;
 using RestSharp;
 
 namespace Downpour.Implementations.Rutorrent
@@ -20,13 +21,13 @@ namespace Downpour.Implementations.Rutorrent
         public RutorrentSession(string basePath, string user, string password)
         {
             _client = new RestClient(basePath);
-            _authHeader = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{user}:{password}"));
+            _authHeader = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{user}:{password}"));
         }
         
         public Torrent GetTorrentDetails(string torrentHash)
         {
             var request = new RestRequest("/plugins/httprpc/action.php", Method.POST);
-            request.AddHeader("Authorization", _authHeader);
+            request.AddHeader("Authorization", $"Basic: {_authHeader}");
             request.AddXmlBody(
 	            $@"<?xml version='1.0'?>
                 <methodCall>
@@ -388,7 +389,16 @@ namespace Downpour.Implementations.Rutorrent
 
         public IEnumerable<Torrent> GetAllTorrents()
         {
-            throw new System.NotImplementedException();
+            var request = new RestRequest("/plugins/httprpc/action.php", Method.POST);
+            request.AddQueryParameter("mode", "list");
+            request.AddQueryParameter("cmd", "d.connection_current=");
+
+            var response = _client.Execute(request);
+
+            if (string.IsNullOrEmpty(response.Content)) return null;
+            
+            var responseObject = JsonConvert.DeserializeObject<Deluge.JsonObjects.GetAllTorrentsResponse>(response.Content);
+	        return responseObject.Result.Values.Select(t => t.ToTorrent()).ToList();
         }
 
         public DownpourResult RemoveTorrent(string torrentHash, bool withData)
