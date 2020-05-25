@@ -390,6 +390,7 @@ namespace Downpour.Implementations.Rutorrent
         public IEnumerable<Torrent> GetAllTorrents()
         {
             var request = new RestRequest("/plugins/httprpc/action.php", Method.POST);
+            request.AddHeader("Authorization", $"Basic {_authHeader}");
             request.AddQueryParameter("mode", "list");
             request.AddQueryParameter("cmd", "d.connection_current=");
 
@@ -403,7 +404,119 @@ namespace Downpour.Implementations.Rutorrent
 
         public DownpourResult RemoveTorrent(string torrentHash, bool withData)
         {
-            throw new System.NotImplementedException();
+	        string withDataXml = withData
+		        ? $@"
+				<value>
+	                <struct>
+	                    <member>
+	                        <name>methodName</name>
+	                        <value>
+	                            <string>d.custom5.set</string>
+	                        </value>
+	                    </member>
+	                    <member>
+	                        <name>params</name>
+	                        <value>
+	                            <array>
+	                                <data>
+	                                    <value>
+	                                        <string>{torrentHash}</string>
+	                                    </value>
+	                                    <value>
+	                                        <string>1</string>
+	                                    </value>
+	                                </data>
+	                            </array>
+	                        </value>
+	                    </member>
+	                </struct>
+	            </value>"
+		        :"";
+	        
+	        string bodyString = $@"
+				<?xml version=""1.0"" encoding=""UTF-8""?>
+	            <methodCall>
+	                <methodName>system.multicall</methodName>
+	                <params>
+	                    <param>
+	                        <value>
+	                            <array>
+	                                <data>
+	                                    {withDataXml}
+	                                    <value>
+	                                        <struct>
+	                                            <member>
+	                                                <name>methodName</name>
+	                                                <value>
+	                                                    <string>d.delete_tied</string>
+	                                                </value>
+	                                            </member>
+	                                            <member>
+	                                                <name>params</name>
+	                                                <value>
+	                                                    <array>
+	                                                        <data>
+	                                                            <value>
+	                                                                <string>{torrentHash}</string>
+	                                                            </value>
+	                                                        </data>
+	                                                    </array>
+	                                                </value>
+	                                            </member>
+	                                        </struct>
+	                                    </value>
+	                                    <value>
+	                                        <struct>
+	                                            <member>
+	                                                <name>methodName</name>
+	                                                <value>
+	                                                    <string>d.erase</string>
+	                                                </value>
+	                                            </member>
+	                                            <member>
+	                                                <name>params</name>
+	                                                <value>
+	                                                    <array>
+	                                                        <data>
+	                                                            <value>
+	                                                                <string>{torrentHash}</string>
+	                                                            </value>
+	                                                        </data>
+	                                                    </array>
+	                                                </value>
+	                                            </member>
+	                                        </struct>
+	                                    </value>
+	                                </data>
+	                            </array>
+	                        </value>
+	                    </param>
+	                </params>
+	            </methodCall>";
+	        
+	        var request = new RestRequest("/plugins/httprpc/action.php", Method.POST);
+	        request.AddHeader("Authorization", $"Basic {_authHeader}");
+	        request.AddXmlBody(bodyString);
+
+	        var response = _client.Execute(request);
+
+	        if (string.IsNullOrEmpty(response.Content)) return DownpourResult.Failure;
+	        
+	        const string pattern = "<(?:i4|string)>(.*?)<";
+
+	        var responseValues = Regex.Matches(response.Content, pattern)
+		        .Cast<Match>()
+		        .Select(m => m.Groups[1].Value)
+		        .ToList();
+
+	        if (responseValues[0] == "1" && responseValues[1] == "0")
+	        {
+		        return DownpourResult.Success;
+	        }
+	        else
+	        {
+		        return DownpourResult.Failure;
+	        }
         }
 
         public DownpourResult PauseTorrent(string torrentHash)
