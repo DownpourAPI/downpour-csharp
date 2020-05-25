@@ -7,11 +7,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Authentication;
 using Downpour.Common;
 using Downpour.Implementations.Deluge.JsonObjects;
 using Newtonsoft.Json;
 using RestSharp;
-using RestSharp.Extensions;
 
 namespace Downpour.Implementations.Deluge
 {
@@ -31,17 +31,35 @@ namespace Downpour.Implementations.Deluge
             var request = new RestRequest(Method.POST);
             request.AddParameter("application/json", body, ParameterType.RequestBody);
             var response = _client.Execute(request);
+
+            if (!response.IsSuccessful)
+            {
+                throw new AuthenticationException(
+                    $"Failed to log in. Server responded with \"{(int) response.StatusCode}: {response.StatusDescription}\""
+                );
+            }
         }
         
         public Torrent GetTorrentDetails(string torrentHash)
         {
-            string body = $"{{\"id\":1,\"method\":\"core.get_torrent_status\",\"params\":[\"{torrentHash}\", []]}}";
+            string body = $"{{\"id\":1,\"method\":\"core.get_torrent_status\",\"params\":[\"{torrentHash}\",[]]}}";
             var request = new RestRequest(Method.POST);
             request.AddParameter("application/json", body, ParameterType.RequestBody);
             var response = _client.Execute(request);
-            var responseObject = JsonConvert.DeserializeObject<GetTorrentResponse>(response.Content);
 
-            return responseObject.Result.ToTorrent();
+            if (!response.IsSuccessful)
+            {
+                throw new Exception($"Server returned {(int) response.StatusCode}: {response.StatusDescription}");
+            }
+
+            var responseObject = JsonConvert.DeserializeObject<GetTorrentResponse>(response.Content);
+            
+            if (responseObject.Error != null)
+            {
+                throw new Exception($"Server Error: {responseObject.Error.Code}: {responseObject.Error.Message}");
+            }
+
+            return responseObject.Result?.ToTorrent();
         }
 
         public IEnumerable<Torrent> GetAllTorrents()
