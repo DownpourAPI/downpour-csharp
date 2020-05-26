@@ -569,7 +569,25 @@ namespace Downpour.Implementations.Rutorrent
 
         public AddTorrentResult AddTorrentFile(Stream torrentFile)
         {
-            throw new System.NotImplementedException();
+	        byte[] fileArray;
+	        using (var ms = new MemoryStream())
+	        {
+		        torrentFile.CopyTo(ms);
+		        fileArray = ms.ToArray();
+	        }
+            
+	        string fileB64 = Convert.ToBase64String(fileArray).Substring(0, 8);
+	        
+            var request = new RestRequest("/php/addtorrent.php", Method.POST);
+            request.AddHeader("Authorization", $"Basic {_authHeader}");
+            request.AddFile("torrent_file[]", fileArray, fileB64);
+
+            var response = _client.Execute(request);
+            
+            if (string.IsNullOrEmpty(response.Content) || !response.Content.EndsWith("success\");")) { return AddTorrentResult.Failure(); }
+
+            // There is no way to find the Hash with this method. Would potentially need to read the contents of the .torrent file itself
+            return AddTorrentResult.Success("");
         }
 
         public DownpourResult ForceRecheck(string torrentHash)
