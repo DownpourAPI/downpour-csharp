@@ -621,7 +621,36 @@ namespace Downpour.Implementations.Rutorrent
 
         public long GetFreeSpace()
         {
-            throw new System.NotImplementedException();
+	        var allTorrents = GetAllTorrents().ToList();
+
+	        if (!allTorrents.Any()) return -1;
+
+	        string hash = allTorrents.First().Hash;
+
+	        string body = $@"
+				<?xml version='1.0'?>
+                <methodCall>
+                	<methodName>d.free_diskspace</methodName>
+                	<params>
+                		<param>
+                			<value>
+                				<string>{hash}</string>
+                			</value>
+                		</param>
+                	</params>
+                </methodCall>";
+	        
+	        var request = new RestRequest("/plugins/httprpc/action.php", Method.POST);
+	        request.AddHeader("Authorization", $"Basic {_authHeader}");
+	        request.AddXmlBody(body);
+
+	        var response = _client.Execute(request);
+
+	        if (string.IsNullOrEmpty(response.Content)) return -1;
+
+	        return long.TryParse(Regex.Match(response.Content, "<i8>(.*?)<").Groups[1].Value, out long result)
+		        ? result
+		        : -1;
         }
     }
 }
