@@ -538,7 +538,19 @@ namespace Downpour.Implementations.Rutorrent
 
         public DownpourResult ResumeTorrent(string torrentHash)
         {
-            throw new System.NotImplementedException();
+	        var request = new RestRequest("/plugins/httprpc/action.php", Method.POST);
+	        request.AddHeader("Authorization", $"Basic {_authHeader}");
+	        request.AddQueryParameter("mode", "start");
+	        request.AddQueryParameter("hash", torrentHash);
+
+	        var response = _client.Execute(request);
+
+	        if (string.IsNullOrEmpty(response.Content) || response.Content != "[\"0\",\"0\"]")
+	        {
+		        return DownpourResult.Failure;
+	        }
+
+	        return DownpourResult.Success;
         }
 
         public AddTorrentResult AddMagnet(string magnetLink)
