@@ -20,7 +20,8 @@ namespace Downpour.Implementations.Rutorrent
         
         public RutorrentSession(string basePath, string user, string password)
         {
-            _client = new RestClient(basePath);
+	        // TODO: Check whether DefaultHeader works instead of adding one per request.
+	        _client = new RestClient(basePath);
             _authHeader = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{user}:{password}"));
         }
         
@@ -592,7 +593,30 @@ namespace Downpour.Implementations.Rutorrent
 
         public DownpourResult ForceRecheck(string torrentHash)
         {
-            throw new System.NotImplementedException();
+	        string body = $@"
+				<?xml version='1.0'?>
+                <methodCall>
+                	<methodName>d.check_hash</methodName>
+                	<params>
+                		<param>
+                			<value>
+                				<string>{torrentHash}</string>
+                			</value>
+                		</param>
+                	</params>
+                </methodCall>";
+	        
+	        var request = new RestRequest("/plugins/httprpc/action.php", Method.POST);
+	        request.AddHeader("Authorization", $"Basic {_authHeader}");
+	        request.AddXmlBody(body);
+
+	        var response = _client.Execute(request);
+
+	        if (string.IsNullOrEmpty(response.Content)) return DownpourResult.Failure;
+
+	        string actionResult = Regex.Match(response.Content, "<i4>(.*?)<").Groups[1].Value;
+
+	        return actionResult == "0" ? DownpourResult.Success : DownpourResult.Failure;
         }
 
         public long GetFreeSpace()
