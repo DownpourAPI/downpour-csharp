@@ -555,7 +555,16 @@ namespace Downpour.Implementations.Rutorrent
 
         public AddTorrentResult AddMagnet(string magnetLink)
         {
-            throw new System.NotImplementedException();
+            var request = new RestRequest("/php/addtorrent.php", Method.POST);
+            request.AddHeader("Authorization", $"Basic {_authHeader}");
+            request.AddQueryParameter("url", magnetLink);
+
+            var response = _client.Execute(request);
+
+            if (string.IsNullOrEmpty(response.Content) || !response.Content.EndsWith("success\");")) { return AddTorrentResult.Failure(); }
+
+            const string pattern = "btih:(.*?)&";
+            return AddTorrentResult.Success(Regex.Match(response.Content, pattern).Groups[1].Value);
         }
 
         public AddTorrentResult AddTorrentFile(Stream torrentFile)
